@@ -1,5 +1,6 @@
 import {FC, ReactElement} from 'react';
 import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {PRIMARY_COLOR} from '../Theme';
 
 interface ButtonProps {
   label?: string;
@@ -13,7 +14,8 @@ const Button: FC<ButtonProps> = ({label, icon, isColored = false, onPress}) => {
     <TouchableOpacity onPress={() => onPress()}>
       <View style={style.button}>
         {label && (
-          <Text style={{color: isColored ? '#5A11CC' : '#000', ...style.text}}>
+          <Text
+            style={{color: isColored ? PRIMARY_COLOR : '#000', ...style.text}}>
             {label}
           </Text>
         )}
@@ -25,7 +27,7 @@ const Button: FC<ButtonProps> = ({label, icon, isColored = false, onPress}) => {
 
 const style = StyleSheet.create({
   button: {
-    width: 50,
+    // width: 50,
     height: 70,
     padding: 10,
     margin: 10,
@@ -33,7 +35,7 @@ const style = StyleSheet.create({
     justifyContent: 'center',
   },
   text: {
-    fontFamily: 'Poppins-Medium',
+    fontFamily: 'Poppins-SemiBold',
     fontSize: 30,
   },
 });

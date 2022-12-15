@@ -1,10 +1,15 @@
 import {useState} from 'react';
-import {Image, StyleSheet, Text, View} from 'react-native';
+import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import Button from '../Components/Button';
+import FontAwsome5 from 'react-native-vector-icons/FontAwesome5';
+import Octicons from 'react-native-vector-icons/Octicons';
+import {PRIMARY_COLOR} from '../Theme';
 
 const Calculator = () => {
   const [result, setResult] = useState<string>('');
   const [calcul, setCalcul] = useState<string>('');
+  const [isFunction, setIsFuction] = useState<boolean>(false);
+  const [showHistory, setShowHistory] = useState<boolean>(false);
   const onButtonPress = (data: string) => {
     if (data === 'del') {
       setCalcul(calcul.slice(0, -1));
@@ -37,94 +42,161 @@ const Calculator = () => {
   return (
     <View style={style.container}>
       <View style={style.header}>
-        <Text style={style.result}>{result}</Text>
-        <Text style={style.calcul}>{calcul}</Text>
+        <FontAwsome5
+          name="history"
+          size={25}
+          color="#fff"
+          onPress={() => setShowHistory(true)}
+        />
+        <View>
+          <Text style={style.result}>{result}</Text>
+          <Text style={style.calcul}>{calcul}</Text>
+        </View>
       </View>
       <Image
         style={{width: '100%', height: 40}}
         source={require('../assets/icons/bottom.png')}
       />
-      <View style={style.body}>
-        <View style={style.row}>
-          <Button
-            onPress={() => onButtonPress('c')}
-            isColored={true}
-            label="C"
-          />
-          <Button
-            onPress={() => onButtonPress('/100')}
-            isColored={true}
-            label="%"
-          />
-          <Button
-            onPress={() => onButtonPress('del')}
-            isColored={true}
-            icon={
-              <Image
-                style={{width: 50, height: 50}}
-                source={require('../assets/icons/delete.png')}
+      {!isFunction && (
+        <View style={style.body}>
+          <View style={style.row}>
+            <Button
+              onPress={() => onButtonPress('c')}
+              isColored={true}
+              label="C"
+            />
+            <Button
+              onPress={() => onButtonPress('*')}
+              isColored={true}
+              icon={
+                <FontAwsome5 name="star-of-life" size={25} color="#6E00FF" />
+              }
+            />
+            <Button
+              onPress={() => onButtonPress('/')}
+              isColored={true}
+              icon={<FontAwsome5 name="divide" size={25} color="#6E00FF" />}
+            />
+            <Button
+              onPress={() => onButtonPress('del')}
+              isColored={true}
+              icon={<FontAwsome5 name="backspace" size={25} color="#6E00FF" />}
+            />
+          </View>
+
+          <View style={style.row}>
+            <Button onPress={() => onButtonPress('7')} label="7" />
+            <Button onPress={() => onButtonPress('8')} label="8" />
+            <Button onPress={() => onButtonPress('9')} label="9" />
+            <Button
+              onPress={() => onButtonPress('+')}
+              isColored={true}
+              icon={<FontAwsome5 name="plus" size={25} color="#6E00FF" />}
+            />
+          </View>
+
+          <View style={style.row}>
+            <Button onPress={() => onButtonPress('4')} label="4" />
+            <Button onPress={() => onButtonPress('5')} label="5" />
+            <Button onPress={() => onButtonPress('6')} label="6" />
+            <Button
+              onPress={() => onButtonPress('+')}
+              isColored={true}
+              icon={<FontAwsome5 name="minus" size={25} color="#6E00FF" />}
+            />
+          </View>
+
+          <View
+            style={{
+              flex: 1,
+              flexDirection: 'row',
+              alignItems: 'center',
+              paddingRight: 30,
+            }}>
+            <View style={{flexGrow: 1}}>
+              <View style={{...style.row}}>
+                <Button onPress={() => onButtonPress('1')} label="1" />
+                <Button onPress={() => onButtonPress('2')} label="2" />
+                <Button onPress={() => onButtonPress('3')} label="3" />
+              </View>
+              <View style={style.row}>
+                <Button
+                  onPress={() => setIsFuction(true)}
+                  icon={
+                    <FontAwsome5
+                      name="square-root-alt"
+                      size={25}
+                      color="#000"
+                    />
+                  }
+                />
+                <Button onPress={() => onButtonPress('0')} label="0" />
+                <Button onPress={() => onButtonPress('.')} label="." />
+              </View>
+            </View>
+            <TouchableOpacity onPress={() => onButtonPress('=')}>
+              <View style={style.equalButton}>
+                <FontAwsome5 name="equals" size={20} color="#fff" />
+              </View>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
+
+      {isFunction && (
+        <View style={style.body}>
+          <View style={style.row}>
+            <View style={style.col}>
+              <Button
+                label="INV"
+                isColored
+                onPress={() => onButtonPress('INV(')}
               />
-            }
-          />
-          <Button
-            onPress={() => onButtonPress('/')}
-            isColored={true}
-            label="/"
-          />
-        </View>
+              <Button label="sin" onPress={() => onButtonPress('INV(')} />
+              <Button label="ln" onPress={() => onButtonPress('DEG(')} />
+              <Button label="Pi" onPress={() => onButtonPress('%')} />
+              <Button label="(" onPress={() => onButtonPress('%')} />
+            </View>
 
-        <View style={style.row}>
-          <Button onPress={() => onButtonPress('7')} label="7" />
-          <Button onPress={() => onButtonPress('8')} label="8" />
-          <Button onPress={() => onButtonPress('9')} label="9" />
-          <Button
-            onPress={() => onButtonPress('*')}
-            isColored={true}
-            label="*"
-          />
-        </View>
-
-        <View style={style.row}>
-          <Button onPress={() => onButtonPress('4')} label="4" />
-          <Button onPress={() => onButtonPress('5')} label="5" />
-          <Button onPress={() => onButtonPress('6')} label="6" />
-          <Button
-            onPress={() => onButtonPress('+')}
-            isColored={true}
-            label="+"
-          />
-        </View>
-
-        <View style={style.row}>
-          <Button onPress={() => onButtonPress('1')} label="1" />
-          <Button onPress={() => onButtonPress('2')} label="2" />
-          <Button onPress={() => onButtonPress('3')} label="3" />
-          <Button
-            onPress={() => onButtonPress('-')}
-            isColored={true}
-            label="-"
-          />
-        </View>
-
-        <View style={style.row}>
-          <Button
-            onPress={() => onButtonPress('+-')}
-            icon={
-              <Image
-                style={{width: 50, height: 50}}
-                source={require('../assets/icons/+-.png')}
+            <View style={style.col}>
+              <Button
+                label="DEG"
+                isColored
+                onPress={() => onButtonPress('DEG(')}
               />
-            }
-          />
-          <Button onPress={() => onButtonPress('0')} label="0" />
-          <Button onPress={() => onButtonPress('.')} label="." />
-          <Button
-            onPress={() => onButtonPress('=')}
-            isColored={true}
-            label="="
-          />
+              <Button label="cos" onPress={() => onButtonPress('INV(')} />
+              <Button label="log" onPress={() => onButtonPress('DEG(')} />
+              <Button label="e" onPress={() => onButtonPress('%')} />
+              <Button label=")" onPress={() => onButtonPress('%')} />
+            </View>
+
+            <View style={style.col}>
+              <Button label="%" isColored onPress={() => onButtonPress('%')} />
+              <Button label="tan" onPress={() => onButtonPress('INV(')} />
+              <Button
+                icon={
+                  <FontAwsome5 name="square-root-alt" size={25} color="#000" />
+                }
+                onPress={() => onButtonPress('DEG(')}
+              />
+              <Button label="^" onPress={() => onButtonPress('%')} />
+              <Button
+                icon={<Octicons name="number" size={30} color="#000" />}
+                onPress={() => setIsFuction(false)}
+              />
+            </View>
+          </View>
         </View>
-      </View>
+      )}
+
+      {showHistory && (
+        <View style={style.history}>
+          <View style={style.historyBody}>
+            <Text>History</Text>
+          </View>
+          <View style={style.historyFooter}></View>
+        </View>
+      )}
     </View>
   );
 };
@@ -135,11 +207,10 @@ const style = StyleSheet.create({
   },
   header: {
     flex: 0.4,
-    backgroundColor: '#5A11CC',
+    backgroundColor: '#6E00FF',
     alignItems: 'flex-end',
-    justifyContent: 'flex-end',
-    paddingRight: 20,
-    paddingBottom: 20,
+    justifyContent: 'space-between',
+    padding: 20,
   },
   result: {
     color: '#fff',
@@ -157,6 +228,33 @@ const style = StyleSheet.create({
   row: {
     flexDirection: 'row',
     justifyContent: 'space-evenly',
+  },
+  col: {
+    flexDirection: 'column',
+    justifyContent: 'space-evenly',
+    alignItems: 'center',
+  },
+  equalButton: {
+    backgroundColor: '#6E00FF',
+    width: 60,
+    height: 130,
+    borderRadius: 5,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  history: {
+    position: 'absolute',
+    flex: 1,
+    height: '100%',
+    width: '100%',
+  },
+  historyBody: {
+    backgroundColor: PRIMARY_COLOR,
+    flexGrow: 1,
+  },
+  historyFooter: {
+    height: 100,
+    backgroundColor: '#00000095',
   },
 });
 
