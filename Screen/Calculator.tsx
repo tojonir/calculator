@@ -1,5 +1,14 @@
 import {useState} from 'react';
-import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {
+  Animated,
+  Dimensions,
+  Image,
+  PanResponder,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import Button from '../Components/Button';
 import FontAwsome5 from 'react-native-vector-icons/FontAwesome5';
 import Octicons from 'react-native-vector-icons/Octicons';
@@ -9,7 +18,37 @@ const Calculator = () => {
   const [result, setResult] = useState<string>('');
   const [calcul, setCalcul] = useState<string>('');
   const [isFunction, setIsFuction] = useState<boolean>(false);
-  const [showHistory, setShowHistory] = useState<boolean>(false);
+  const {height} = Dimensions.get('window');
+  const pan = useState<any>(new Animated.ValueXY({x: 0, y: -height}))[0];
+
+  const showHistory = (state: boolean = true) => {
+    Animated.spring(pan, {
+      toValue: {x: 0, y: state ? 0 : -750},
+      useNativeDriver: false,
+    }).start();
+  };
+
+  const panResponder = useState(
+    PanResponder.create({
+      onMoveShouldSetPanResponder: () => true,
+      onPanResponderGrant: () => {
+        pan.setOffset({
+          x: pan.x._value,
+          y: pan.y._value,
+        });
+      },
+      onPanResponderMove: (_, gesture) => {
+        if (gesture.moveY <= 600) pan.y.setValue(gesture.dy);
+      },
+      onPanResponderRelease: (_, gesture) => {
+        if (gesture.moveY <= height / 1.5) {
+          showHistory(false);
+        }
+        pan.flattenOffset();
+      },
+    }),
+  )[0];
+
   const onButtonPress = (data: string) => {
     if (data === 'del') {
       setCalcul(calcul.slice(0, -1));
@@ -46,7 +85,7 @@ const Calculator = () => {
           name="history"
           size={25}
           color="#fff"
-          onPress={() => setShowHistory(true)}
+          onPress={() => showHistory()}
         />
         <View>
           <Text style={style.result}>{result}</Text>
@@ -189,14 +228,19 @@ const Calculator = () => {
         </View>
       )}
 
-      {showHistory && (
-        <View style={style.history}>
-          <View style={style.historyBody}>
-            <Text>History</Text>
-          </View>
-          <View style={style.historyFooter}></View>
+      <Animated.View
+        style={{
+          top: pan.y,
+          ...style.history,
+        }}>
+        <View style={style.historyBody}>
+          <Text>History</Text>
+          <View
+            style={style.historyCloseBtn}
+            {...panResponder.panHandlers}></View>
         </View>
-      )}
+        <View style={style.historyFooter}></View>
+      </Animated.View>
     </View>
   );
 };
@@ -251,10 +295,19 @@ const style = StyleSheet.create({
   historyBody: {
     backgroundColor: PRIMARY_COLOR,
     flexGrow: 1,
+    alignItems: 'center',
   },
   historyFooter: {
     height: 100,
     backgroundColor: '#00000095',
+  },
+  historyCloseBtn: {
+    position: 'absolute',
+    bottom: 0,
+    width: 100,
+    height: 10,
+    backgroundColor: '#fff',
+    borderRadius: 20,
   },
 });
 
