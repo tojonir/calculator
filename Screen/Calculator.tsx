@@ -2,6 +2,7 @@ import {useState} from 'react';
 import {
   Animated,
   Dimensions,
+  FlatList,
   Image,
   PanResponder,
   StyleSheet,
@@ -14,16 +15,22 @@ import FontAwsome5 from 'react-native-vector-icons/FontAwesome5';
 import Octicons from 'react-native-vector-icons/Octicons';
 import {PRIMARY_COLOR} from '../Theme';
 
+interface historyInterFace {
+  date: string;
+  operation: string;
+}
+
 const Calculator = () => {
   const [result, setResult] = useState<string>('');
   const [calcul, setCalcul] = useState<string>('');
   const [isFunction, setIsFuction] = useState<boolean>(false);
+  const [history, sethistory] = useState<historyInterFace[]>([]);
   const {height} = Dimensions.get('window');
   const pan = useState<any>(new Animated.ValueXY({x: 0, y: -height}))[0];
 
   const showHistory = (state: boolean = true) => {
     Animated.spring(pan, {
-      toValue: {x: 0, y: state ? 0 : -750},
+      toValue: {x: 0, y: state ? 0 : -height},
       useNativeDriver: false,
     }).start();
   };
@@ -44,6 +51,9 @@ const Calculator = () => {
         if (gesture.moveY <= height / 1.5) {
           showHistory(false);
         }
+        if (gesture.moveY >= height / 1.5) {
+          showHistory();
+        }
         pan.flattenOffset();
       },
     }),
@@ -56,6 +66,14 @@ const Calculator = () => {
       setCalcul('');
       setResult('');
     } else if (data === '=') {
+      sethistory([
+        {
+          date:
+            new Date().toDateString() + ' ' + new Date().toLocaleTimeString(),
+          operation: calcul,
+        },
+        ...history,
+      ]);
       setResult(eval(calcul));
     } else if (data === '/' || data === '*' || data === '-' || data === '+') {
       if (
@@ -234,7 +252,31 @@ const Calculator = () => {
           ...style.history,
         }}>
         <View style={style.historyBody}>
-          <Text>History</Text>
+          <FlatList
+            style={{width: '100%'}}
+            data={history}
+            renderItem={({item}) => (
+              <View style={{padding: 10}}>
+                <Text style={{...style.textLight}}>{item.date}</Text>
+                <Text
+                  style={{
+                    ...style.textLight,
+                    textAlign: 'right',
+                    fontSize: 20,
+                  }}>
+                  {item.operation}
+                </Text>
+                <Text
+                  style={{
+                    ...style.textLight,
+                    textAlign: 'right',
+                    fontSize: 40,
+                  }}>
+                  {eval(item.operation)}
+                </Text>
+              </View>
+            )}
+          />
           <View
             style={style.historyCloseBtn}
             {...panResponder.panHandlers}></View>
@@ -255,6 +297,10 @@ const style = StyleSheet.create({
     alignItems: 'flex-end',
     justifyContent: 'space-between',
     padding: 20,
+  },
+  textLight: {
+    color: '#fff',
+    fontFamily: 'Poppins-Medium',
   },
   result: {
     color: '#fff',
